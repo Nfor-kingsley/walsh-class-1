@@ -1,4 +1,5 @@
 
+import os
 # for data manipulation
 import pandas as pd
 # for building the preprocessing and modeling pipeline
@@ -11,6 +12,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 # for model serialization and experiment tracking
 import joblib
 import mlflow
+...
 
 mlflow.set_tracking_uri("https://anthill-deduce-sprint.ngrok-free.dev")
 mlflow.set_experiment("Tourism Package Prediction")
