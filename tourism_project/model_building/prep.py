@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-df = pd.read_csv("/content/tourism_project/data/tourism.csv")
+df = pd.read_csv("tourism_project/data/tourism.csv")
 df.drop(columns=["CustomerID"], inplace=True)
 
 target = "ProdTaken"
