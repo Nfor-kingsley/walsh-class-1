@@ -1,66 +1,66 @@
-
+import os
 import streamlit as st
 import pandas as pd
 import joblib
-import os
 
-# Set page title
-st.set_page_config(page_title="Wellness Tourism Package Prediction")
+# Load the model committed by the pipeline (sits next to this file)
+model_path = os.path.join(os.path.dirname(__file__), "tourism_project/deployment/app.py")   # complete the code: filename of the trained model saved by train.py (must match the filename you used there)
+model = joblib.load(model_path)
 
-st.title("Wellness Tourism Package Purchase Prediction")
-st.write("This app predicts whether a customer will purchase the Wellness Tourism Package.")
+# Streamlit UI for Tourism Package Prediction
+st.title("Tourism Package Prediction")
+st.write("Fill the customer details below to predict if they'll purchase a travel package")
 
-# Load the trained model
-model_path = "model.joblib"
-if os.path.exists(model_path):
-    model = joblib.load(model_path)
-else:
-    st.error("Model file not found. Please ensure model.joblib is in the same directory.")
+# Collect user input
+Age = st.slider("Age", 18, 70, 30)
+TypeofContact = st.selectbox("Type of Contact", ["Self Enquiry", "Company Invited"])
+CityTier = st.selectbox("City Tier", [1, 2, 3])
+DurationOfPitch = st.slider("Duration of Pitch (mins)", 0, 100, 15)
+Occupation = st.selectbox("Occupation", ["Salaried", "Small Business", "Large Business", "Free Lancer"])
+Gender = st.selectbox("Gender", ["Male", "Female", "Others"])
+NumberOfPersonVisiting = st.slider("Number of Persons Visiting", 1, 5, 2)
+NumberOfFollowups = st.slider("Number of Follow-ups", 1, 10, 3)
+ProductPitched = st.selectbox("Product Pitched", ["Basic", "Standard", "Deluxe", "Super Deluxe", "King"])
+PreferredPropertyStar = st.selectbox("Preferred Property Star", [1, 2, 3, 4, 5])
+MaritalStatus = st.selectbox("Marital Status", ["Married", "Single", "Divorced", "Unmarried"])
+NumberOfTrips = st.slider("Number of Trips", 1, 20, 3)
+Passport = st.selectbox("Has Passport?", ["Yes", "No"])
+PitchSatisfactionScore = st.slider("Pitch Satisfaction Score", 1, 5, 3)
+OwnCar = st.selectbox("Owns a Car?", ["Yes", "No"])
+NumberOfChildrenVisiting = st.slider("Number of Children Visited", 0, 5, 1)
+Designation = st.selectbox("Designation", ["Executive", "Manager", "AVP", "VP", "Sr. Manager"])
+MonthlyIncome = st.number_input("Monthly Income", min_value=1000.0, value=30000.0)
 
-# Create input fields for features
-st.header("Customer Information")
+# ----------------------------
+# Prepare input data
+# ----------------------------
+input_data = pd.DataFrame([{
+    'Age': Age,
+    'TypeofContact': TypeofContact,
+    'CityTier': CityTier,
+    'DurationOfPitch': DurationOfPitch,
+    'Occupation': Occupation,
+    'Gender': Gender,
+    'NumberOfPersonVisiting': NumberOfPersonVisiting,
+    'NumberOfFollowups': NumberOfFollowups,
+    'ProductPitched': ProductPitched,
+    'PreferredPropertyStar': PreferredPropertyStar,
+    'MaritalStatus': MaritalStatus,
+    'NumberOfTrips': NumberOfTrips,
+    'Passport': 1 if Passport == "Yes" else 0,
+    'PitchSatisfactionScore': PitchSatisfactionScore,
+    'OwnCar': 1 if OwnCar == "Yes" else 0,
+    'NumberOfChildrenVisiting': NumberOfChildrenVisiting,
+    'Designation': Designation,
+    'MonthlyIncome': MonthlyIncome
+}])
 
-col1, col2 = st.columns(2)
+# Set the classification threshold
+classification_threshold = 0.45
 
-with col1:
-    age = st.number_input("Age", min_value=18, max_value=100, value=35)
-    type_of_contact = st.selectbox("Type of Contact", ["Self Enquiry", "Company Invited"])
-    city_tier = st.selectbox("City Tier", [1, 2, 3])
-    occupation = st.selectbox("Occupation", ["Salaried", "Small Business", "Large Business", "Free Lancer"])
-    gender = st.selectbox("Gender", ["Male", "Female"])
-    num_person = st.number_input("Number of Person Visiting", min_value=1, max_value=10, value=2)
-    prop_star = st.selectbox("Preferred Property Star", [3, 4, 5])
-    marital_status = st.selectbox("Marital Status", ["Single", "Married", "Divorced", "Unmarried"])
-
-with col2:
-    num_trips = st.number_input("Number of Trips", min_value=1, max_value=20, value=3)
-    passport = st.selectbox("Has Passport?", [0, 1])
-    own_car = st.selectbox("Owns Car?", [0, 1])
-    num_children = st.number_input("Number of Children Visiting", min_value=0, max_value=5, value=0)
-    designation = st.selectbox("Designation", ["Manager", "Executive", "Senior Manager", "AVP", "VP"])
-    monthly_income = st.number_input("Monthly Income", min_value=0, value=25000)
-    pitch_score = st.slider("Pitch Satisfaction Score", 1, 5, 3)
-    prod_pitched = st.selectbox("Product Pitched", ["Basic", "Deluxe", "Standard", "Super Deluxe", "King"])
-    followups = st.number_input("Number of Followups", 1, 10, 3)
-    duration = st.number_input("Duration of Pitch", 1, 120, 15)
-
-# Prediction button
+# Predict button
 if st.button("Predict"):
-    input_data = pd.DataFrame([{
-        "Age": age, "TypeofContact": type_of_contact, "CityTier": city_tier,
-        "Occupation": occupation, "Gender": gender, "NumberOfPersonVisiting": num_person,
-        "PreferredPropertyStar": prop_star, "MaritalStatus": marital_status,
-        "NumberOfTrips": num_trips, "Passport": passport, "OwnCar": own_car,
-        "NumberOfChildrenVisiting": num_children, "Designation": designation,
-        "MonthlyIncome": monthly_income, "PitchSatisfactionScore": pitch_score,
-        "ProductPitched": prod_pitched, "NumberOfFollowups": followups,
-        "DurationOfPitch": duration
-    }])
-
-    prediction = model.predict(input_data)[0]
-    probability = model.predict_proba(input_data)[0][1]
-
-    if prediction == 1:
-        st.success(f"Targeted: The customer is likely to purchase the package. (Probability: {probability:.2f})")
-    else:
-        st.warning(f"Not Targeted: The customer is unlikely to purchase the package. (Probability: {probability:.2f})")
+    prob = model.predict_proba(input_data)[0,1]
+    pred = int(prob >= classification_threshold)
+    result = "will purchase the travel package" if pred == 1 else "is unlikely to purchase"
+    st.write(f"Prediction: Customer {result}")
