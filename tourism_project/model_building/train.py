@@ -14,7 +14,7 @@ import joblib
 import mlflow
 ...
 
-mlflow.set_tracking_uri("https://anthill-deduce-sprint.ngrok-free.dev")
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
 mlflow.set_experiment("Tourism Package Prediction")
 
 # Xtrain/Xtest/ytrain/ytest are downloaded from the previous job's artifact
