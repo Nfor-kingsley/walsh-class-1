@@ -83,10 +83,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git pull --rebase origin main
+          git fetch origin main
+          git rebase origin/main
 
           git add tourism_project/deployment/*.joblib
 
           git commit -m "Add trained model [skip ci]" || echo "No changes to commit"
 
-          git push origin main
+          git push origin HEAD:main
